@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Home
+{% endblock %}
+{% block main %}
+    <div id="Info" class="alert alert-success" role="alert"></div>
+    <br><br><br>
+    <form action="/" method="post">
+        <input type="hidden" id="lat" name="lat"/>
+        <input type="hidden" id="lon" name="lon"/>
+        <legend>How much time have you on average spent outside in the past five days?</legend>
+        <div>
+              <input type="radio" id="0" name="radio" value="0" checked>
+              <label for="Less than 30 minutes">Less than 30 minutes</label>
+
+              <input type="radio" id="1" name="radio" value="1">
+              <label for="Less than 2 hours">Less than 2 hours</label>
+
+              <input type="radio" id="2" name="radio" value="2">
+              <label for="More than two hours">More than 2 hours</label>
+        </div>
+        <br><br><br>
+        <button class="btn btn-outline-primary btn-lg" type="submit">Get my latest Vitamin D report</button>
+    </form>
+    <br><br>
+    {% if api_forecast %}
+        <div id="report_space">
+            <p>
+               {{ report }}
+                Please also see the chart with the UV Index and Cloud forecast below to find opportunities to get outside.
+                Please be aware that Vitamin D producing UV-B radiation is available all year round only between the 35th parallel north and south.
+                <br>
+                This report will be saved so that you may look at it again anytime. <a href="/history">Click here</a> for your report history.
+            </p>
+        </div>
+        <table class ="table table-striped" style="text-align:left">
+           <thead>
+               <tr>
+                   <th>Date</th>
+                   <th>Maximum UV Index</th>
+                   <th>Cloudiness (%)</th>
+               </tr>
+           </thead>
+           <tbody>
+                {% for rows in api_forecast %}
+                    <tr>
+                    {% for key, value in rows.items() %}
+                        <td>
+                            {{ value }}
+                        </td>
+                    {% endfor %}
+                    </tr>
+                {% endfor %}
+           </tbody>
+        </table>
+    {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded',
+        function() {
+           navigator.geolocation.getCurrentPosition(
+        function (position) {
+                document.getElementById("Info").innerHTML =
+                "<strong>Locating successful</strong>. Your location is Latitude: " + position.coords.latitude +" Longitude: "+ position.coords.longitude;
+                document.getElementById("lat").value = position.coords.latitude;
+                document.getElementById("lon").value = position.coords.longitude;
+            });
+        });
+    </script>
+{% endblock %}
